@@ -26,7 +26,7 @@ if [ -e "/etc/os-release" ]; then
         "centos" | "rhel fedora" | "rhel")
             OS='Centos'
             ;;
-        *) 
+        *)
             ;;
     esac
 fi
@@ -55,21 +55,22 @@ source "${SCRIPT_PATH}"/lib/richRulesPolicy.sh
 
 # 如果入参是 add 则自动完成默认防火墙添加
 if [ "${COMMAND}" == "add" ]; then
-	printf "${GREEN_COLOR}开始添加防火墙策略，请耐心等待...${RES}\n"	
-	bash "${SCRIPT_PATH}"/bin/firewall-policy-create-auto-rule.sh 2>&1 | tee -a "${SCRIPT_PATH}"/log/create/create-auto-firewall-"$(date +%Y-%m%d-%H%M%S)".log
-  exit 1
+    printf "${GREEN_COLOR}开始添加防火墙策略，请耐心等待...${RES}\n"	
+    bash "${SCRIPT_PATH}"/bin/firewall-policy-create-auto-rule.sh 2>&1 | tee -a "${SCRIPT_PATH}"/log/create/create-auto-firewall-"$(date +%Y-%m%d-%H%M%S)".log
+    exit 1
+
 # 如果入参是 del 则自动完成默认防火墙删除
 elif [ "${COMMAND}" == "del" ]; then
-  # 防火墙未运行不执行自动删除策略
-  Firewall_Status_Stop
-	printf "${RED_COLOR}开始删除防火墙策略，请耐心等待...${RES}\n"	
-	bash "${SCRIPT_PATH}"/bin/firewall-policy-delete-auto-rule.sh 2>&1 | tee -a "${SCRIPT_PATH}"/log/delete/delete-auto-firewall-"$(date +%Y-%m%d-%H%M%S)".log
-  exit 1
+    # 防火墙未运行不执行自动删除策略
+    Firewall_Status_Stop
+    printf "${RED_COLOR}开始删除防火墙策略，请耐心等待...${RES}\n"	
+    bash "${SCRIPT_PATH}"/bin/firewall-policy-delete-auto-rule.sh 2>&1 | tee -a "${SCRIPT_PATH}"/log/delete/delete-auto-firewall-"$(date +%Y-%m%d-%H%M%S)".log
+    exit 1
 fi
 
 
 #打印菜单
-MENU(){
+MENU () {
 printf "${BLUE_COLOR}\n##############################${RES}
 ${RED_COLOR}1.${RES} ${BLUE_COLOR}自动添加 *默认* 相关防火墙策略${RES}
 ${RED_COLOR}2.${RES} ${BLUE_COLOR}自动删除 *默认* 相关防火墙策略${RES}
@@ -83,7 +84,7 @@ ${BLUE_COLOR}##############################${RES}\n"
 }
 
 
-# 菜单 
+# 菜单
 MENU
 
 # 判断不存在目录则创建
@@ -113,18 +114,20 @@ while read -e -p "$(echo -e "${RED_COLOR}请选择输入数字: ${RES}")" Number
 
         "3")
             read -e -p "$(echo -e "${RED_COLOR}请问添加防火墙策略时，是否需要保险，防止被锁在墙外。添加自动定时任务，15分钟后关闭防火墙。(y/n) ${RES}")" YesNo
+
             if [ "${YesNo}" == "Y" -o "${YesNo}" == "y" ]; then
                 # 将已配置的定时间隔关闭防火墙任务到crond服务下管理
                 /bin/cp -rf "${SCRIPT_PATH}"/conf/wait_until_stopped_firewalld /etc/cron.d/ && \
-                chown root:root /etc/cron.d/wait_until_stopped_firewalld && \
-                chmod 0644 /etc/cron.d/wait_until_stopped_firewalld
-                
+                /bin/chown root:root /etc/cron.d/wait_until_stopped_firewalld && \
+                /bin/chmod 0644 /etc/cron.d/wait_until_stopped_firewalld
+
                 bash "${SCRIPT_PATH}"/bin/firewall-policy-create-manually-rule.sh 2>&1 | tee -a "${SCRIPT_PATH}"/log/create/create-manually-firewall-"$(date +%Y-%m%d-%H%M%S)".log
 
             elif [ "${YesNo}" == "N" -o "${YesNo}" == "n" ]; then
                 # 从crond服务中移除定时间隔关闭防火墙任务
-                /bin/rm -f /etc/cron.d/wait_until_stopped_firewalld &>/dev/null 
+                /bin/rm -f /etc/cron.d/wait_until_stopped_firewalld &>/dev/null
                 bash "${SCRIPT_PATH}"/bin/firewall-policy-create-manually-rule.sh 2>&1 | tee -a "${SCRIPT_PATH}"/log/create/create-manually-firewall-"$(date +%Y-%m%d-%H%M%S)".log
+
             else
                 printf "${RED_COLOR}请正确输入选项: (y/n) \n${RES}"
             fi
@@ -136,6 +139,7 @@ while read -e -p "$(echo -e "${RED_COLOR}请选择输入数字: ${RES}")" Number
             Firewall_Status_Stop
 
             read -e -p "$(echo -e "${RED_COLOR}请问删除防火墙策略时，是否需要保险，防止被锁在墙外。添加自动定时任务，15分钟后关闭防火墙。(y/n) ${RES}")" YesNo
+
             if [ "${YesNo}" == "Y" -o "${YesNo}" == "y" ]; then
                 # 将已配置的定时间隔关闭防火墙任务到crond服务下管理
                 /bin/cp -rf "${SCRIPT_PATH}"/conf/wait_until_stopped_firewalld /etc/cron.d/ && \
@@ -146,7 +150,7 @@ while read -e -p "$(echo -e "${RED_COLOR}请选择输入数字: ${RES}")" Number
 
             elif [ "${YesNo}" == "N" -o "${YesNo}" == "n" ]; then
                 # 从crond服务中移除定时间隔关闭防火墙任务
-                /bin/rm -f /etc/cron.d/wait_until_stopped_firewalld &>/dev/null 
+                /bin/rm -f /etc/cron.d/wait_until_stopped_firewalld &>/dev/null
 
                 bash "${SCRIPT_PATH}"/bin/firewall-policy-delete-manually-rule.sh 2>&1 | tee -a "${SCRIPT_PATH}"/log/delete/delete-manually-firewall-"$(date +%Y-%m%d-%H%M%S)".log
             else

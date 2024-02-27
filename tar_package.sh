@@ -17,7 +17,7 @@ NOW="$(date +%Y_%m%d_%H%M%S)"
 mkdir -p "${TAR_SCRIPT_PATH}"/distr/
 
 # 删除脏数据
-/bin/rm -rf "${TAR_SCRIPT_PATH}"/{logs,backup}
+/bin/rm -rf "${TAR_SCRIPT_PATH}"/{logs,backup,log}
 
 # 排除assembly目录,并生成tar安装包
 tar --exclude="./*/tar_package.sh" \
