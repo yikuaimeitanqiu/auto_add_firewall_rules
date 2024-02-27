@@ -118,6 +118,18 @@ if [ -n "${REMOTE_ADDR}" -a -n "${LOCAL_ADDR}" -a -n "${PROTOCOL}" ]; then
 	elif [ -n "${REMOTE_PORT}" -a -z "${LOCAL_PORT}" -a "${ACCEPT_DROP}" == "drop" ]; then
         printf "${RED_COLOR}禁止指定远端地址：${REMOTE_ADDR} 通过指定远端端口:${REMOTE_PORT}/${PROTOCOL} 访问本地地址：${LOCAL_ADDR}${RES}"
         RichRules="rule family=ipv4 source address=${REMOTE_ADDR} destination address=${LOCAL_ADDR} source-port port=${REMOTE_PORT} protocol=${PROTOCOL} drop"
+
+  # 允许指定远端地址通过指定远端端口访问指定本地地址的指定端口
+	elif [ -n "${REMOTE_PORT}" -a -n "${LOCAL_PORT}" -a "${ACCEPT_DROP}" == "accept" ]; then
+        printf "${RED_COLOR}允许指定远端地址：${REMOTE_ADDR} 通过指定远端端口:${REMOTE_PORT}/${PROTOCOL} 访问本地地址：${LOCAL_ADDR} 的指定端口:${LOCAL_PORT}${RES}"
+        printf "\n\n${RED_COLOR}远端端口与本地端口不可时存在规则中,无法完成添加!!!${RES}\n"
+        RichRules=""
+
+  # 禁止指定远端地址通过指定远端端口访问指定本地地址的指定端口
+	elif [ -n "${REMOTE_PORT}" -a -n "${LOCAL_PORT}" -a "${ACCEPT_DROP}" == "drop" ]; then
+        printf "${RED_COLOR}禁止指定远端地址：${REMOTE_ADDR} 通过指定远端端口:${REMOTE_PORT}/${PROTOCOL} 访问本地地址：${LOCAL_ADDR} 的指定端口:${LOCAL_PORT}${RES}"
+        printf "\n\n${RED_COLOR}远端端口与本地端口不可时存在规则中,无法完成添加!!!${RES}\n"
+        RichRules=""
 	fi
 fi
 }
@@ -155,35 +167,35 @@ ONLY_REMOTE_LOCAL_ADDR_RULES () {
 if [ -n "${REMOTE_ADDR}" -o -n "${LOCAL_ADDR}" -a -z "${REMOTE_PORT}" -a -z "${LOCAL_PORT}" -a -z "${PROTOCOL}" ]; then
 
     # 允许指定远端地址访问
-	if [ -n "${REMOTE_ADDR}" -a -z "${LOCAL_ADDR}" -a "${ACCEPT_DROP}" == "accept" ]; then
-		printf "${RED_COLOR}允许指定远端地址：${REMOTE_ADDR} 访问${RES}"
+    if [ -n "${REMOTE_ADDR}" -a -z "${LOCAL_ADDR}" -a -z "${REMOTE_PORT}" -a -z "${LOCAL_PORT}" -a "${ACCEPT_DROP}" == "accept" ]; then
+        printf "${RED_COLOR}允许指定远端地址：${REMOTE_ADDR} 访问${RES}"
         RichRules="rule family=ipv4 source address=${REMOTE_ADDR} accept"
-	
+
     # 禁止指定远端地址访问
-	elif [ -n "${REMOTE_ADDR}" -a -z "${LOCAL_ADDR}" -a "${ACCEPT_DROP}" == "drop" ]; then
-		printf "${RED_COLOR}禁止指定远端地址：${REMOTE_ADDR} 访问${RES}"
-		RichRules="rule family=ipv4 source address=${REMOTE_ADDR} drop"
+    elif [ -n "${REMOTE_ADDR}" -a -z "${LOCAL_ADDR}" -a -z "${REMOTE_PORT}" -a -z "${LOCAL_PORT}" -a "${ACCEPT_DROP}" == "drop" ]; then
+        printf "${RED_COLOR}禁止指定远端地址：${REMOTE_ADDR} 访问${RES}"
+        RichRules="rule family=ipv4 source address=${REMOTE_ADDR} drop"
 
     # 允许指定本地地址被访问
-	elif [ -z "${REMOTE_ADDR}" -a -n "${LOCAL_ADDR}" -a "${ACCEPT_DROP}" == "accept" ]; then
+    elif [ -z "${REMOTE_ADDR}" -a -n "${LOCAL_ADDR}" -a -z "${REMOTE_PORT}" -a -z "${LOCAL_PORT}" -a "${ACCEPT_DROP}" == "accept" ]; then
         printf "${RED_COLOR}允许指定本地地址：${LOCAL_ADDR} 被访问${RES}"
         RichRules="rule family=ipv4 destination address=${LOCAL_ADDR} accept"
 
     # 禁止指定本地地址被访问
-	elif [ -z "${REMOTE_ADDR}" -a -n "${LOCAL_ADDR}" -a "${ACCEPT_DROP}" == "drop" ]; then
+    elif [ -z "${REMOTE_ADDR}" -a -n "${LOCAL_ADDR}" -a -z "${REMOTE_PORT}" -a -z "${LOCAL_PORT}" -a "${ACCEPT_DROP}" == "drop" ]; then
         printf "${RED_COLOR}禁止指定访问本地地址：${LOCAL_ADDR} 被访问${RES}"
         RichRules="rule family=ipv4 destination address=${LOCAL_ADDR}  drop"
 
     # 允许指定远端地址访问本地地址
-	elif [ -n "${REMOTE_ADDR}" -a -n "${LOCAL_ADDR}" -a "${ACCEPT_DROP}" == "accept" ]; then
+    elif [ -n "${REMOTE_ADDR}" -a -n "${LOCAL_ADDR}" -a -z "${REMOTE_PORT}" -a -z "${LOCAL_PORT}" -a "${ACCEPT_DROP}" == "accept" ]; then
         printf "${RED_COLOR}允许指定远端地址: ${REMOTE_ADDR} 访问本地地址: ${LOCAL_ADDR}${RES}"
         RichRules="rule family=ipv4 source address=${REMOTE_ADDR} destination address=${LOCAL_ADDR} accept"
 
     # 禁止指定远端地址访问本地地址
-	elif [ -n "${REMOTE_ADDR}" -a -n "${LOCAL_ADDR}" -a "${ACCEPT_DROP}" == "drop" ]; then
+    elif [ -n "${REMOTE_ADDR}" -a -n "${LOCAL_ADDR}" -a -z "${REMOTE_PORT}" -a -z "${LOCAL_PORT}" -a "${ACCEPT_DROP}" == "drop" ]; then
         printf "${RED_COLOR}禁止指定远端地址: ${REMOTE_ADDR} 访问本地地址: ${LOCAL_ADDR}${RES}"
         RichRules="rule family=ipv4 source addres=${REMOTE_ADDR} destination address=${LOCAL_ADDR} drop"
-	fi
+    fi
 
 fi
 }
