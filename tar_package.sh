@@ -25,6 +25,7 @@ tar --exclude="./*/tar_package.sh" \
     --exclude="./*/.git" \
     --exclude="./*/.gitignore" \
     --exclude="./*/*/.gitignore" \
+    --exclude="./*/publish_file_server.sh" \
     -cvzf "${TAR_SCRIPT_PATH}"/distr/auto_add_firewall_rules-x86_64-"${NOW}".tar.gz \
     -C "${TAR_SCRIPT_PATH}"/../ \
     ./auto_add_firewall_rules/
