@@ -1,0 +1,49 @@
+stages:
+  # 定义阶段
+  # 完成项目构建后，推送安装包
+  - build_project_push_storage
+
+# 推送部署包到网盘，仅在打了 tag 或所有分支变更时，并且在传入 version 变量才执行流水线
+build_project_push_storage_job:
+  # 指定任务属于 push 阶段
+  stage: build_project_push_storage
+
+  # 设置空缓存
+  cache: {}
+
+  variables:
+    # 使用 clone 模式获取完整的分支代码
+    GIT_STRATEGY: clone
+    # 强制拉取
+    GIT_FETCH_EXTRA_FLAGS: "--force"
+    # 确保克隆后删除未跟踪或忽略的文件
+    GIT_CLEAN_FLAGS: "-ffdx"
+
+  script:
+    # 生成安装包
+    - ./tar_package.sh
+    # 推送到网盘
+    - ./push_storage.sh
+
+
+  tags:
+    # 指定 Runner 的标签为 linux_x86:docker://java:8
+    - linux_x86:docker://java:8
+
+  only:
+    refs:
+      # 在所有分支上都触发任务
+      - branches
+
+  artifacts:
+    paths:
+      # 指定要保存的制品文件路径
+      - ./distr/*.tar.gz
+    # 制品文件的过期时间
+    expire_in: 1 days
+
+  # 设置当前阶段超时时间 30 分钟，默认超时间60分钟
+  # gitlab 11.8.2 不支持此语法,需要12.1之后版本
+  # timeout: 30m
+
+
