@@ -1,93 +1,68 @@
 # auto_add_firewall_rules
 
+防火墙规则自动添加
 
 
-## Getting started
+## 使用说明
+- 通过添加富规则策略实现对系统进行防护。
 
-To make it easy for you to get started with GitLab, here's a list of recommended next steps.
+- 此脚本只适用于Centos7系统使用。
 
-Already a pro? Just edit this README.md and make it your own. Want to make it easy? [Use the template at the bottom](#editing-this-readme)!
+- 脚本目录结构：
+    ```shell
+    ├── backup          #删除防火墙策略时用于存放临时文件
+    ├── conf            #存放脚本目录
+    │   ├── addFirewall_nuas.sh     #自动添加nuas策略脚本
+    │   ├── addFirewall.sh          #添加防火墙脚本
+    │   ├── crond_Default.sh        #清理定时关闭防火墙脚本
+    │   ├── crond_Stop.sh           #增加定时关闭防火墙脚本
+    │   ├── deleteFirewall.sh       #删除防火墙脚本
+    │   ├── queryFirewall.sh        #查询防火墙脚本
+    │   └── removeFirewall_nuas.sh  #自动删除nuas策略脚本
+    ├── install.sh      #主脚本
+    └── log             #执行脚本日志生成目录
+    ```
 
-## Add your files
+- 运行方法：
+    ```shell
+    tar -xvf auto_add_firewall_rules*.tar.gz
+    cd ./auto_add_firewall_rules
+    ./install
+    ```
 
-- [ ] [Create](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#create-a-file) or [upload](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#upload-a-file) files
-- [ ] [Add files using the command line](https://docs.gitlab.com/ee/gitlab-basics/add-file.html#add-a-file-using-the-command-line) or push an existing Git repository with the following command:
 
-```
-cd existing_repo
-git remote add origin https://gitlab.meitanqiu.site/guweisheng/auto_add_firewall_rules.git
-git branch -M main
-git push -uf origin main
-```
+- 菜单说明：
+    ```shell
+    请选择:
+    1. 自动添加 *默认* 相关防火墙策略
+    2. 自动删除 *默认* 相关防火墙策略
+    3. 手动添加防火墙策略(慎重)
+    4. 手动删除防火墙策略(慎重)
+    5. 查看已生效的防火墙策略
+    6. 手动启动防火墙服务
+    7. 手动停止防火墙服务
+    8. 已完成确认，确认退出.(请勿强制退出)
+    ```
+    - 通过输入数字执行对应脚本功能。请正确输入数字，并按提示操作。
+    - 自动添加删除nuas策略，只针对nuas服务开启对外访问服务。
+    - 退出脚本请一定要输入数字：8 ，否则会影响防火墙服务运行状态。
+        - 8 为清理保险设置并同时退出脚本。
 
-## Integrate with your tools
 
-- [ ] [Set up project integrations](https://gitlab.meitanqiu.site/guweisheng/auto_add_firewall_rules/-/settings/integrations)
+- 添加防火墙策略流程：
+    - `3-->5-->8`
+        - 输入3，添加自定义防火墙时，建议开启保险，15分钟后自动停止防火墙服务，防止错误策略在生产环境中被阻挡在墙外。（某些生产环境中需要限制SSH地址访问，如对策略了解可以不启用保险。）
+        - 端口号、协议类型、处理规则  三个为必填，根据提示并结合自身实际需求，完成策略添加。
+        - 输入5，查看刚添加的策略是否已生效。
+        - 输入8，退出并清理定时关闭防火墙脚本。
 
-## Collaborate with your team
 
-- [ ] [Invite team members and collaborators](https://docs.gitlab.com/ee/user/project/members/)
-- [ ] [Create a new merge request](https://docs.gitlab.com/ee/user/project/merge_requests/creating_merge_requests.html)
-- [ ] [Automatically close issues from merge requests](https://docs.gitlab.com/ee/user/project/issues/managing_issues.html#closing-issues-automatically)
-- [ ] [Enable merge request approvals](https://docs.gitlab.com/ee/user/project/merge_requests/approvals/)
-- [ ] [Set auto-merge](https://docs.gitlab.com/ee/user/project/merge_requests/merge_when_pipeline_succeeds.html)
+- 删除防火墙策略流程：
+    - `4-->5-->8`
+        - 输入4，查看所有已生效的富规则策略，对需要删除的策略，输入行首的数字编号，确认即可删除。建议开启保险，15分钟后自动停止防火墙服务，防止错误策略在生产环境中被阻挡在墙外。（某些生产环境中需要限制SSH地址访问，如对策略了解可以不启用保险。）
+        - 输入5，查看刚删除的策略是否已生效。
+        - 输入8，退出并清理定时关闭防火墙脚本。
 
-## Test and Deploy
+- 6/7 手动启动防火墙服务
 
-Use the built-in continuous integration in GitLab.
 
-- [ ] [Get started with GitLab CI/CD](https://docs.gitlab.com/ee/ci/quick_start/index.html)
-- [ ] [Analyze your code for known vulnerabilities with Static Application Security Testing (SAST)](https://docs.gitlab.com/ee/user/application_security/sast/)
-- [ ] [Deploy to Kubernetes, Amazon EC2, or Amazon ECS using Auto Deploy](https://docs.gitlab.com/ee/topics/autodevops/requirements.html)
-- [ ] [Use pull-based deployments for improved Kubernetes management](https://docs.gitlab.com/ee/user/clusters/agent/)
-- [ ] [Set up protected environments](https://docs.gitlab.com/ee/ci/environments/protected_environments.html)
-
-***
-
-# Editing this README
-
-When you're ready to make this README your own, just edit this file and use the handy template below (or feel free to structure it however you want - this is just a starting point!). Thanks to [makeareadme.com](https://www.makeareadme.com/) for this template.
-
-## Suggestions for a good README
-
-Every project is different, so consider which of these sections apply to yours. The sections used in the template are suggestions for most open source projects. Also keep in mind that while a README can be too long and detailed, too long is better than too short. If you think your README is too long, consider utilizing another form of documentation rather than cutting out information.
-
-## Name
-Choose a self-explaining name for your project.
-
-## Description
-Let people know what your project can do specifically. Provide context and add a link to any reference visitors might be unfamiliar with. A list of Features or a Background subsection can also be added here. If there are alternatives to your project, this is a good place to list differentiating factors.
-
-## Badges
-On some READMEs, you may see small images that convey metadata, such as whether or not all the tests are passing for the project. You can use Shields to add some to your README. Many services also have instructions for adding a badge.
-
-## Visuals
-Depending on what you are making, it can be a good idea to include screenshots or even a video (you'll frequently see GIFs rather than actual videos). Tools like ttygif can help, but check out Asciinema for a more sophisticated method.
-
-## Installation
-Within a particular ecosystem, there may be a common way of installing things, such as using Yarn, NuGet, or Homebrew. However, consider the possibility that whoever is reading your README is a novice and would like more guidance. Listing specific steps helps remove ambiguity and gets people to using your project as quickly as possible. If it only runs in a specific context like a particular programming language version or operating system or has dependencies that have to be installed manually, also add a Requirements subsection.
-
-## Usage
-Use examples liberally, and show the expected output if you can. It's helpful to have inline the smallest example of usage that you can demonstrate, while providing links to more sophisticated examples if they are too long to reasonably include in the README.
-
-## Support
-Tell people where they can go to for help. It can be any combination of an issue tracker, a chat room, an email address, etc.
-
-## Roadmap
-If you have ideas for releases in the future, it is a good idea to list them in the README.
-
-## Contributing
-State if you are open to contributions and what your requirements are for accepting them.
-
-For people who want to make changes to your project, it's helpful to have some documentation on how to get started. Perhaps there is a script that they should run or some environment variables that they need to set. Make these steps explicit. These instructions could also be useful to your future self.
-
-You can also document commands to lint the code or run tests. These steps help to ensure high code quality and reduce the likelihood that the changes inadvertently break something. Having instructions for running tests is especially helpful if it requires external setup, such as starting a Selenium server for testing in a browser.
-
-## Authors and acknowledgment
-Show your appreciation to those who have contributed to the project.
-
-## License
-For open source projects, say how it is licensed.
-
-## Project status
-If you have run out of energy or time for your project, put a note at the top of the README saying that development has slowed down or stopped completely. Someone may choose to fork your project or volunteer to step in as a maintainer or owner, allowing your project to keep going. You can also make an explicit request for maintainers.
