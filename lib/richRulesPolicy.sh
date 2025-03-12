@@ -7,7 +7,7 @@
 LIB_SCRIPT_PATH="$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 
 # 获取字体颜色
-source "${LIB_SCRIPT_PATH}"/../conf/color.sh &>/dev/null
+. "${LIB_SCRIPT_PATH}"/../conf/color.sh &>/dev/null
 
 # 默认添加 SSH 服务连接,防止会话连接中断
 Firewall_SSH () {

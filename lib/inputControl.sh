@@ -9,7 +9,7 @@
 LIB_SCRIPT_PATH="$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 
 # 获取字体颜色
-source "${LIB_SCRIPT_PATH}"/../conf/color.sh &>/dev/null
+. "${LIB_SCRIPT_PATH}"/../conf/color.sh &>/dev/null
 
 # 输入远端地址参数,只匹配IPV4
 read -e -p "$(echo -e "${BLUE_COLOR}请输入限制访问的远端地址(x.x.x.x | x.x.x.x/xx):  ${RES}")" REMOTE_ADDR

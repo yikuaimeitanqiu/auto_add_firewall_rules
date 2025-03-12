@@ -13,10 +13,10 @@ BIN_SCRIPT_PATH="$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && 
 TIME="$(date +%Y%m%d_%H%M%S)"
 
 # 引用 防火墙富规则
-source "${BIN_SCRIPT_PATH}"/../lib/richRulesPolicy.sh
+. "${BIN_SCRIPT_PATH}"/../lib/richRulesPolicy.sh
 
 # 获取字体颜色
-source "${BIN_SCRIPT_PATH}"/../conf/color.sh &>/dev/null
+. "${BIN_SCRIPT_PATH}"/../conf/color.sh &>/dev/null
 
 # 判断防火墙未运行,退出
 Firewall_Status_Stop
