@@ -7,13 +7,13 @@
 BIN_SCRIPT_PATH="$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 
 # 获取字体颜色
-source "${BIN_SCRIPT_PATH}"/../conf/color.sh &>/dev/null
+. "${BIN_SCRIPT_PATH}"/../conf/color.sh &>/dev/null
 
 # 引用 "IPV4地址/端口号/协议类型/动作策略" 检测函数
-source "${BIN_SCRIPT_PATH}"/../lib/detectionParameter.sh
+. "${BIN_SCRIPT_PATH}"/../lib/detectionParameter.sh
 
 # 引用 防火墙富规则
-source "${BIN_SCRIPT_PATH}"/../lib/richRulesPolicy.sh
+. "${BIN_SCRIPT_PATH}"/../lib/richRulesPolicy.sh
 
 # 防火墙未运行不执行自动删除策略
 Firewall_Status_Stop
@@ -34,7 +34,7 @@ echo "${Import_Path}" | while read Import_Paths; do
 
     # 匹配过滤符合规则的防火墙策略,不符合的不执行删除
     grep -E "${REGULAR}" "${Import_Paths}" | while read ListStrategy; do
-  
+
         # 远端地址
         REMOTE_ADDR=$(grep -E "${REGULAR}" <<< "${ListStrategy}" | awk -F '#' '{print $2}')
         REMOTE_ADDR_TEST

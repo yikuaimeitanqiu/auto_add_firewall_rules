@@ -7,7 +7,7 @@
 BIN_SCRIPT_PATH="$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 
 # 获取字体颜色
-source "${BIN_SCRIPT_PATH}"/../conf/color.sh &>/dev/null
+. "${BIN_SCRIPT_PATH}"/../conf/color.sh &>/dev/null
 
 # 判断防火墙未运行,不打印
 Firewall_State="$(firewall-cmd --state &>/dev/null && echo 'running')"

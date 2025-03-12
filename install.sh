@@ -10,7 +10,7 @@ COMMAND="${1}"
 SCRIPT_PATH="$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 
 # 获取字体颜色
-source "${SCRIPT_PATH}"/conf/color.sh &>/dev/null
+. "${SCRIPT_PATH}"/conf/color.sh &>/dev/null
 
 # 验证操作系统是debian系还是centos
 OS='None'
