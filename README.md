@@ -3,6 +3,7 @@
 
 
 ## 使用说明
+
 - 通过添加富规则策略实现对系统进行防护。
 
 - 此脚本只适用于Centos7系统使用。
@@ -11,22 +12,18 @@
     ```shell
     ├── backup          #删除防火墙策略时用于存放临时文件
     ├── conf            #存放脚本目录
-    │   ├── addFirewall_nuas.sh     #自动添加nuas策略脚本
-    │   ├── addFirewall.sh          #添加防火墙脚本
-    │   ├── crond_Default.sh        #清理定时关闭防火墙脚本
-    │   ├── crond_Stop.sh           #增加定时关闭防火墙脚本
-    │   ├── deleteFirewall.sh       #删除防火墙脚本
-    │   ├── queryFirewall.sh        #查询防火墙脚本
-    │   └── removeFirewall_nuas.sh  #自动删除nuas策略脚本
+    ├── bin             #防火墙脚本
+    ├── lib             #检测入参配置脚本
+    ├── modules         #存放模块目录
     ├── install.sh      #主脚本
     └── log             #执行脚本日志生成目录
     ```
 
 - 运行方法：
     ```shell
-    tar -xvf auto_add_firewall_rules*.tar.gz
+    tar -xvf auto_add_firewall_rules.tar.gz
     cd ./auto_add_firewall_rules
-    ./install
+    ./install.sh
     ```
 
 
@@ -42,10 +39,15 @@
     7. 手动停止防火墙服务
     8. 已完成确认，确认退出.(请勿强制退出)
     ```
-    - 通过输入数字执行对应脚本功能。请正确输入数字，并按提示操作。
-    - 自动添加删除nuas策略，只针对nuas服务开启对外访问服务。
-    - 退出脚本请一定要输入数字：8 ，否则会影响防火墙服务运行状态。
-        - 8 为清理保险设置并同时退出脚本。
+
+- 通过输入数字执行对应脚本功能。请正确输入数字，并按提示操作。
+
+- 自动添加删除策略，只针对 `conf` 目录下，文件自动加载添加删除策略。
+    - `./install.sh add` 自动添加 `conf` 目录下的自定义规则
+    - `./install.sh del` 自动删除 `conf` 目录下的自定义规则
+
+- 退出脚本请一定要输入数字：8 ，否则会影响防火墙服务运行状态。
+    - 8 为清理保险设置并同时退出脚本。
 
 
 - 添加防火墙策略流程：
