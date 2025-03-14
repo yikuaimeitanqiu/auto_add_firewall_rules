@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # 检测用户是否为root
 [ "$(id -u)" -ne 0 ] && { echo "Error: You must be root to run this script"; exit 1; }
@@ -38,40 +38,42 @@ if [ "${OS}" == 'None' ]; then
     elif command -v yum >/dev/null 2>&1; then
         OS='Centos'
     else
-        printf "${RED_COLOR}\n不支持这个系统\n已退出\n\n${RES}"
+        echo -e "${RED_COLOR}\n不支持这个系统\n已退出\n\n${RES}"
         exit 127
     fi
 
 # 此工具暂没适配 iptable
 elif [ "${OS}" == 'Debian' ]; then
-    printf "${RED_COLOR}\n不支持这个系统\n已退出\n\n${RES}"
+    echo -e "${RED_COLOR}\n不支持这个系统\n已退出\n\n${RES}"
     exit 127
 fi
 
 
 # 引用 防火墙富规则
-source "${SCRIPT_PATH}"/lib/richRulesPolicy.sh
+. "${SCRIPT_PATH}"/lib/richRulesPolicy.sh
 
 
 # 如果入参是 add 则自动完成默认防火墙添加
 if [ "${COMMAND}" == "add" ]; then
-    printf "${GREEN_COLOR}开始添加防火墙策略，请耐心等待...${RES}\n"	
-    bash "${SCRIPT_PATH}"/bin/firewall-policy-create-auto-rule.sh 2>&1 | tee -a "${SCRIPT_PATH}"/log/create/create-auto-firewall-"$(date +%Y-%m%d-%H%M%S)".log
-    exit 1
+    echo -e "${GREEN_COLOR}开始添加防火墙策略，请耐心等待...${RES}\n"	
+    bash "${SCRIPT_PATH}"/bin/firewall-policy-create-auto-rule.sh 2>&1 | \
+        tee -a "${SCRIPT_PATH}"/log/create/create-auto-firewall-"$(date +%Y-%m%d-%H%M%S)".log
+    exit 0
 
 # 如果入参是 del 则自动完成默认防火墙删除
 elif [ "${COMMAND}" == "del" ]; then
     # 防火墙未运行不执行自动删除策略
     Firewall_Status_Stop
-    printf "${RED_COLOR}开始删除防火墙策略，请耐心等待...${RES}\n"	
-    bash "${SCRIPT_PATH}"/bin/firewall-policy-delete-auto-rule.sh 2>&1 | tee -a "${SCRIPT_PATH}"/log/delete/delete-auto-firewall-"$(date +%Y-%m%d-%H%M%S)".log
-    exit 1
+    echo -e "${RED_COLOR}开始删除防火墙策略，请耐心等待...${RES}\n"	
+    bash "${SCRIPT_PATH}"/bin/firewall-policy-delete-auto-rule.sh 2>&1 | \
+        tee -a "${SCRIPT_PATH}"/log/delete/delete-auto-firewall-"$(date +%Y-%m%d-%H%M%S)".log
+    exit 0
 fi
 
 
 #打印菜单
 MENU () {
-printf "${BLUE_COLOR}\n##############################${RES}
+echo -e "${BLUE_COLOR}\n##############################${RES}
 ${RED_COLOR}1.${RES} ${BLUE_COLOR}自动添加 *默认* 相关防火墙策略${RES}
 ${RED_COLOR}2.${RES} ${BLUE_COLOR}自动删除 *默认* 相关防火墙策略${RES}
 ${RED_COLOR}3.${RES} ${BLUE_COLOR}手动添加防火墙策略${RES}${RED_COLOR}(慎重)${RES}
@@ -92,44 +94,52 @@ if [ ! -d "${SCRIPT_PATH}"/log ]; then
     /bin/mkdir -p "${SCRIPT_PATH}"/log/{create,delete,query}
 fi
 
+# 提示语
+ADD_TIPS="请问添加防火墙策略时，是否需要保险，防止被锁在墙外。添加自动定时任务，15分钟后关闭防火墙。(y/n)"
+DEL_TIPS="请问删除防火墙策略时，是否需要保险，防止被锁在墙外。添加自动定时任务，15分钟后关闭防火墙。(y/n)"
 
 #选项执行
-while read -e -p "$(echo -e "${RED_COLOR}请选择输入数字: ${RES}")" Number; do
+while read -r -e -p "$(echo -e "${RED_COLOR}请选择输入数字: ${RES}")" Number; do
 
     case ${Number} in
 
         "1")
-            printf "${GREEN_COLOR}开始添加防火墙策略，请耐心等待...${RES}\n"	
-            bash "${SCRIPT_PATH}"/bin/firewall-policy-create-auto-rule.sh 2>&1 | tee -a "${SCRIPT_PATH}"/log/create/create-auto-firewall-"$(date +%Y-%m%d-%H%M%S)".log
+            echo -e "${GREEN_COLOR}开始添加防火墙策略，请耐心等待...${RES}\n"	
+            bash "${SCRIPT_PATH}"/bin/firewall-policy-create-auto-rule.sh 2>&1 | \
+                tee -a "${SCRIPT_PATH}"/log/create/create-auto-firewall-"$(date +%Y-%m%d-%H%M%S)".log
             MENU
             ;;
 
         "2")
             # 防火墙未运行不执行自动删除策略
             Firewall_Status_Stop
-            printf "${GREEN_COLOR}开始删除防火墙策略，请耐心等待...${RES}\n"	
-            bash "${SCRIPT_PATH}"/bin/firewall-policy-delete-auto-rule.sh 2>&1 | tee -a "${SCRIPT_PATH}"/log/delete/delete-auto-firewall-"$(date +%Y-%m%d-%H%M%S)".log
+            echo -e "${GREEN_COLOR}开始删除防火墙策略，请耐心等待...${RES}\n"	
+            bash "${SCRIPT_PATH}"/bin/firewall-policy-delete-auto-rule.sh 2>&1 | \
+                tee -a "${SCRIPT_PATH}"/log/delete/delete-auto-firewall-"$(date +%Y-%m%d-%H%M%S)".log
             MENU
             ;;
 
         "3")
-            read -e -p "$(echo -e "${RED_COLOR}请问添加防火墙策略时，是否需要保险，防止被锁在墙外。添加自动定时任务，15分钟后关闭防火墙。(y/n) ${RES}")" YesNo
+            read -e -r -p "$(echo -e "${RED_COLOR}${ADD_TIPS} ${RES}")" YesNo
 
-            if [ "${YesNo}" == "Y" -o "${YesNo}" == "y" ]; then
+            if [ "${YesNo}" == "Y" ] || [ "${YesNo}" == "y" ]; then
                 # 将已配置的定时间隔关闭防火墙任务到crond服务下管理
-                /bin/cp -rf "${SCRIPT_PATH}"/conf/wait_until_stopped_firewalld /etc/cron.d/ && \
-                /bin/chown root:root /etc/cron.d/wait_until_stopped_firewalld && \
+                /bin/cp -rf "${SCRIPT_PATH}"/conf/wait_until_stopped_firewalld \
+                            /etc/cron.d/wait_until_stopped_firewalld
+                /bin/chown root:root /etc/cron.d/wait_until_stopped_firewalld
                 /bin/chmod 0644 /etc/cron.d/wait_until_stopped_firewalld
 
-                bash "${SCRIPT_PATH}"/bin/firewall-policy-create-manually-rule.sh 2>&1 | tee -a "${SCRIPT_PATH}"/log/create/create-manually-firewall-"$(date +%Y-%m%d-%H%M%S)".log
+                bash "${SCRIPT_PATH}"/bin/firewall-policy-create-manually-rule.sh 2>&1 | \
+                    tee -a "${SCRIPT_PATH}"/log/create/create-manually-firewall-"$(date +%Y-%m%d-%H%M%S)".log
 
-            elif [ "${YesNo}" == "N" -o "${YesNo}" == "n" ]; then
+            elif [ "${YesNo}" == "N" ] || [ "${YesNo}" == "n" ]; then
                 # 从crond服务中移除定时间隔关闭防火墙任务
                 /bin/rm -f /etc/cron.d/wait_until_stopped_firewalld &>/dev/null
-                bash "${SCRIPT_PATH}"/bin/firewall-policy-create-manually-rule.sh 2>&1 | tee -a "${SCRIPT_PATH}"/log/create/create-manually-firewall-"$(date +%Y-%m%d-%H%M%S)".log
+                bash "${SCRIPT_PATH}"/bin/firewall-policy-create-manually-rule.sh 2>&1 | \
+                    tee -a "${SCRIPT_PATH}"/log/create/create-manually-firewall-"$(date +%Y-%m%d-%H%M%S)".log
 
             else
-                printf "${RED_COLOR}请正确输入选项: (y/n) \n${RES}"
+                echo -e "${RED_COLOR}请正确输入选项: (y/n) \n${RES}"
             fi
             MENU
             ;;
@@ -138,30 +148,34 @@ while read -e -p "$(echo -e "${RED_COLOR}请选择输入数字: ${RES}")" Number
             # 防火墙未运行不执行自动删除策略
             Firewall_Status_Stop
 
-            read -e -p "$(echo -e "${RED_COLOR}请问删除防火墙策略时，是否需要保险，防止被锁在墙外。添加自动定时任务，15分钟后关闭防火墙。(y/n) ${RES}")" YesNo
+            read -e -r -p "$(echo -e "${RED_COLOR}${DEL_TIPS} ${RES}")" YesNo
 
-            if [ "${YesNo}" == "Y" -o "${YesNo}" == "y" ]; then
+            if [ "${YesNo}" == "Y" ] || [ "${YesNo}" == "y" ]; then
                 # 将已配置的定时间隔关闭防火墙任务到crond服务下管理
-                /bin/cp -rf "${SCRIPT_PATH}"/conf/wait_until_stopped_firewalld /etc/cron.d/ && \
-                chown root:root /etc/cron.d/wait_until_stopped_firewalld && \
+                /bin/cp -rf "${SCRIPT_PATH}"/conf/wait_until_stopped_firewalld \
+                            /etc/cron.d/wait_until_stopped_firewalld
+                chown root:root /etc/cron.d/wait_until_stopped_firewalld
                 chmod 0644 /etc/cron.d/wait_until_stopped_firewalld
 
-                bash "${SCRIPT_PATH}"/bin/firewall-policy-delete-manually-rule.sh 2>&1 | tee -a "${SCRIPT_PATH}"/log/delete/delete-manually-firewall-"$(date +%Y-%m%d-%H%M%S)".log
+                bash "${SCRIPT_PATH}"/bin/firewall-policy-delete-manually-rule.sh 2>&1 | \
+                    tee -a "${SCRIPT_PATH}"/log/delete/delete-manually-firewall-"$(date +%Y-%m%d-%H%M%S)".log
 
-            elif [ "${YesNo}" == "N" -o "${YesNo}" == "n" ]; then
+            elif [ "${YesNo}" == "N" ] || [ "${YesNo}" == "n" ]; then
                 # 从crond服务中移除定时间隔关闭防火墙任务
                 /bin/rm -f /etc/cron.d/wait_until_stopped_firewalld &>/dev/null
 
-                bash "${SCRIPT_PATH}"/bin/firewall-policy-delete-manually-rule.sh 2>&1 | tee -a "${SCRIPT_PATH}"/log/delete/delete-manually-firewall-"$(date +%Y-%m%d-%H%M%S)".log
+                bash "${SCRIPT_PATH}"/bin/firewall-policy-delete-manually-rule.sh 2>&1 | \
+                    tee -a "${SCRIPT_PATH}"/log/delete/delete-manually-firewall-"$(date +%Y-%m%d-%H%M%S)".log
             else
 
-                printf "${RED_COLOR}请正确输入选项: (y/n) ${RES}\n"
+                echo -e "${RED_COLOR}请正确输入选项: (y/n) ${RES}\n"
             fi
             MENU
             ;;
 
         "5")
-            bash "${SCRIPT_PATH}"/bin/firewall-policy-query-rule.sh 2>&1 | tee -a "${SCRIPT_PATH}"/log/query/query-"$(date +%Y-%m%d-%H%M%S)".log
+            bash "${SCRIPT_PATH}"/bin/firewall-policy-query-rule.sh 2>&1 | \
+                tee -a "${SCRIPT_PATH}"/log/query/query-"$(date +%Y-%m%d-%H%M%S)".log
             MENU
             ;;
 
@@ -185,7 +199,7 @@ while read -e -p "$(echo -e "${RED_COLOR}请选择输入数字: ${RES}")" Number
             ;;
 
         *)
-            printf "${RED_COLOR}请正确输入选项：（1/2/3/4/5/6/7/8）\n${RES}"
+            echo -e "${RED_COLOR}请正确输入选项：（1/2/3/4/5/6/7/8）\n${RES}"
             MENU
             ;;
 
