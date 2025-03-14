@@ -7,7 +7,7 @@
 BIN_SCRIPT_PATH="$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 
 # 获取字体颜色
-. "${BIN_SCRIPT_PATH}"/../conf/color.sh &>/dev/null
+. "${BIN_SCRIPT_PATH}"/../modules/color.sh &>/dev/null
 
 # 引用 "IPV4地址/端口号/协议类型/动作策略" 检测函数
 . "${BIN_SCRIPT_PATH}"/../lib/detectionParameter.sh
@@ -30,10 +30,10 @@ Import_Path="$(find "${BIN_SCRIPT_PATH}"/../conf -type f | grep -E ".conf$")"
 REGULAR='^#.+([0-9]+|.*-.*)#.+#(accept|drop)#$'
 
 # 循环取自定义配置模板,并进行配置
-echo "${Import_Path}" | while read Import_Paths; do 
+echo "${Import_Path}" | while read -r Import_Paths; do 
 
     # 匹配过滤符合规则的防火墙策略,不符合的不执行删除
-    grep -E "${REGULAR}" "${Import_Paths}" | while read ListStrategy; do
+    grep -E "${REGULAR}" "${Import_Paths}" | while read -r ListStrategy; do
 
         # 远端地址
         REMOTE_ADDR=$(grep -E "${REGULAR}" <<< "${ListStrategy}" | awk -F '#' '{print $2}')
@@ -65,12 +65,11 @@ echo "${Import_Path}" | while read Import_Paths; do
         ONLY_REMOTE_LOCAL_ADDR_RULES
 
         # 从富规则检测出来变量进行删除防火墙策略,并输出结果
-		firewall-cmd --permanent --remove-rich-rule="${RichRules}" &>/dev/null
-        if [ $? = 0 ]; then 
-            printf "${GREEN_COLOR}\t删除防火墙策略成功\n${RES}" 
+        if firewall-cmd --permanent --remove-rich-rule="${RichRules}" &>/dev/null; then
+            echo -e "${GREEN_COLOR}\t\t\t删除防火墙策略成功${RES}" 
             firewall-cmd --reload &>/dev/null 
         else
-            printf "${RED_COLOR}\t删除防火墙策略失败，请检查参数，重新设置\n${RES}"
+            echo -e "${RED_COLOR}\t\t\t删除防火墙策略失败，请检查参数，重新设置${RES}"
         fi
 
   done 

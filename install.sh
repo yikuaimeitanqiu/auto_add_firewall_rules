@@ -10,7 +10,7 @@ COMMAND="${1}"
 SCRIPT_PATH="$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 
 # 获取字体颜色
-. "${SCRIPT_PATH}"/conf/color.sh &>/dev/null
+. "${SCRIPT_PATH}"/modules/color.sh &>/dev/null
 
 # 验证操作系统是debian系还是centos
 OS='None'
@@ -124,7 +124,7 @@ while read -r -e -p "$(echo -e "${RED_COLOR}请选择输入数字: ${RES}")" Num
 
             if [ "${YesNo}" == "Y" ] || [ "${YesNo}" == "y" ]; then
                 # 将已配置的定时间隔关闭防火墙任务到crond服务下管理
-                /bin/cp -rf "${SCRIPT_PATH}"/conf/wait_until_stopped_firewalld \
+                /bin/cp -rf "${SCRIPT_PATH}"/modules/wait_until_stopped_firewalld \
                             /etc/cron.d/wait_until_stopped_firewalld
                 /bin/chown root:root /etc/cron.d/wait_until_stopped_firewalld
                 /bin/chmod 0644 /etc/cron.d/wait_until_stopped_firewalld
@@ -152,7 +152,7 @@ while read -r -e -p "$(echo -e "${RED_COLOR}请选择输入数字: ${RES}")" Num
 
             if [ "${YesNo}" == "Y" ] || [ "${YesNo}" == "y" ]; then
                 # 将已配置的定时间隔关闭防火墙任务到crond服务下管理
-                /bin/cp -rf "${SCRIPT_PATH}"/conf/wait_until_stopped_firewalld \
+                /bin/cp -rf "${SCRIPT_PATH}"/modules/wait_until_stopped_firewalld \
                             /etc/cron.d/wait_until_stopped_firewalld
                 chown root:root /etc/cron.d/wait_until_stopped_firewalld
                 chmod 0644 /etc/cron.d/wait_until_stopped_firewalld

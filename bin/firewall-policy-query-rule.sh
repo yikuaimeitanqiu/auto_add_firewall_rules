@@ -7,12 +7,12 @@
 BIN_SCRIPT_PATH="$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 
 # 获取字体颜色
-. "${BIN_SCRIPT_PATH}"/../conf/color.sh &>/dev/null
+. "${BIN_SCRIPT_PATH}"/../modules/color.sh &>/dev/null
 
 # 判断防火墙未运行,不打印
 Firewall_State="$(firewall-cmd --state &>/dev/null && echo 'running')"
 if [ -z "${Firewall_State}" ]; then
-    printf "${RED_COLOR}\n防火墙未运行,未能查询成功!\n\n${RES}" 
+    echo -e "${RED_COLOR}\n防火墙未运行,未能查询成功!\n\n${RES}" 
     exit 1
 fi
 
