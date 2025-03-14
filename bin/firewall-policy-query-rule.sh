@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # Check if user is root
 [ "$(id -u)" -ne 0 ] && { echo "Error: You must be root to run this script"; exit 1; }

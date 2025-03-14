@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # 根据输入参数手动添加防火墙富规则策略
 #
