@@ -12,39 +12,10 @@ SCRIPT_PATH="$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd 
 # 获取字体颜色
 . "${SCRIPT_PATH}"/modules/color.sh &>/dev/null
 
-# 验证操作系统是debian系还是centos
-OS='None'
-
-# 判断操作系统类型
-if [ -e "/etc/os-release" ]; then
-    # 查找匹配文件中的ID值
-    ID="$(grep -E "^ID=" /etc/os-release | awk -F '=' '{print$2}' | tr -d '"')"
-    case ${ID} in
-        "debian" | "ubuntu" | "devuan")
-            OS='Debian'
-            ;;
-        "centos" | "rhel fedora" | "rhel")
-            OS='Centos'
-            ;;
-        *)
-            ;;
-    esac
-fi
-
-# 无法匹配文件找到时,通过命令匹配
-if [ "${OS}" == 'None' ]; then
-    if command -v apt-get >/dev/null 2>&1; then
-        OS='Debian'
-    elif command -v yum >/dev/null 2>&1; then
-        OS='Centos'
-    else
-        echo -e "${RED_COLOR}\n不支持这个系统\n已退出\n\n${RES}"
-        exit 127
-    fi
-
-# 此工具暂没适配 iptable
-elif [ "${OS}" == 'Debian' ]; then
-    echo -e "${RED_COLOR}\n不支持这个系统\n已退出\n\n${RES}"
+# 检测有没有 firewall-cmd 命令
+if ! command -v firewall-cmd 1>/dev/null; then
+    echo -e "${RED_COLOR}\nfirewall-cmd 命令查找不到，无往继续执行。\n已退出\n${RES}"
+    echo -e "${RED_COLOR}请尝试以下命令进行安装：\nyum install -y firewalld\napt-get install -y firewalld\n${RES}"
     exit 127
 fi
 

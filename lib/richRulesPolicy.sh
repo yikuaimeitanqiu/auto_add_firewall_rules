@@ -11,19 +11,41 @@ LIB_SCRIPT_PATH="$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && 
 
 # 默认添加 SSH 服务连接,防止会话连接中断
 Firewall_SSH () {
-  firewall-cmd --permanent --add-service=ssh &>/dev/null
-  firewall-cmd --reload &>/dev/null
+
+    # 获取可能已调整的 ssh 端口号
+    if [ -f /etc/ssh/sshd_config ]; then
+        NEW_SSH_PORT="$( grep -E '^Port ' /etc/ssh/sshd_config | grep -oE '[0-9]{1,5}')"
+        if [ -n "${NEW_SSH_PORT}" ]; then
+            firewall-cmd --permanent --add-port="${NEW_SSH_PORT}"/tcp &>/dev/null
+        fi
+    fi
+
+    # 添加默认ssh服务
+    firewall-cmd --permanent --add-service=ssh &>/dev/null
+    firewall-cmd --reload &>/dev/null
 }
 
 # 检查防火墙是否开启,未运行则运行,如果运行失败则不往下执行
 Firewall_Status () {
-#Firewall_State="$(grep active <<< "$(systemctl status firewalld)" | grep running)"
 Firewall_State="$(firewall-cmd --state &>/dev/null && echo 'running')"
 if [ -z "${Firewall_State}" ]; then
-    service firewalld start &>/dev/null
-    if [ $? -eq 0 ]; then
-        echo -e "${GREEN_COLOR}防火墙已开启\n${RES}" 
+    # 默认发行版本已用 systemctl 管理服务
+    if ! command -v systemctl 1>/dev/null; then
+        echo -e "${RED_COLOR}systemctl 命令未能检查到，无法启动防火墙.\n${RES}" 
+        exit 127
+    fi
+
+    # 检查防火墙，并尝试启动
+    if systemctl start firewalld 1>/dev/null; then
+        if firewall-cmd --state &>/dev/null ; then
+            echo -e "${GREEN_COLOR}防火墙已开启\n${RES}" 
+        else
+            systemctl status firewalld
+            echo -e "${RED_COLOR}防火墙开启失败,请检查原因,再执行此脚本.\n${RES}" 
+            exit 1
+        fi
     else
+        systemctl status firewalld
         echo -e "${RED_COLOR}防火墙开启失败,请检查原因,再执行此脚本.\n${RES}" 
         exit 1
     fi
@@ -32,7 +54,7 @@ fi
 
 # 检查防火墙未开启,不往下执行
 Firewall_Status_Stop () {
-Firewall_State="$(grep active <<< "$(systemctl status firewalld)" | grep running)"
+Firewall_State="$( grep -E '^running$' <<< "$(firewall-cmd --state)" )"
 if [ -z "${Firewall_State}" ]; then
     echo -e "${RED_COLOR}当前防火墙未在运行状态,执行删除策略可能会存在问题,将不执行脚本,退出.\n${RES}" 
     exit 1
