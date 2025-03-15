@@ -187,14 +187,12 @@ if [ -n "${REMOTE_ADDR}" ] && [ -n "${LOCAL_ADDR}" ] && [ -n "${PROTOCOL}" ]; th
     # 允许指定远端地址通过指定远端端口访问指定本地地址的指定端口
     elif [ -n "${REMOTE_PORT}" ] && [ -n "${LOCAL_PORT}" ] && [ "${ACCEPT_DROP}" == "accept" ]; then
         echo -e "${RED_COLOR}在 filter 表 ${TABLE_CHAIN} 链下添加：允许指定远端地址：${REMOTE_ADDR} 通过指定远端端口:${REMOTE_PORT}/${PROTOCOL} 访问本地地址：${LOCAL_ADDR} 的指定端口:${LOCAL_PORT}${RES}"
-        echo -e "\n\n${RED_COLOR}远端端口与本地端口不可时存在规则中,无法完成添加!!!${RES}\n"
-        IPTABLES_RULES=""
+        IPTABLES_RULES="${TABLE_CHAIN} --source ${REMOTE_ADDR} --destination ${LOCAL_ADDR} --protocol ${PROTOCOL} --source-port ${REMOTE_PORT} --destination-port ${LOCAL_PORT} --jump ACCEPT"
 
     # 禁止指定远端地址通过指定远端端口访问指定本地地址的指定端口
     elif [ -n "${REMOTE_PORT}" ] && [ -n "${LOCAL_PORT}" ] && [ "${ACCEPT_DROP}" == "drop" ]; then
         echo -e "${RED_COLOR}在 filter 表 ${TABLE_CHAIN} 链下添加：禁止指定远端地址：${REMOTE_ADDR} 通过指定远端端口:${REMOTE_PORT}/${PROTOCOL} 访问本地地址：${LOCAL_ADDR} 的指定端口:${LOCAL_PORT}${RES}"
-        echo -e "\n\n${RED_COLOR}远端端口与本地端口不可时存在规则中,无法完成添加!!!${RES}\n"
-        IPTABLES_RULES=""
+        IPTABLES_RULES="${TABLE_CHAIN} --source ${REMOTE_ADDR} --destination ${LOCAL_ADDR} --protocol ${PROTOCOL} --source-port ${REMOTE_PORT} --destination-port ${LOCAL_PORT} --jump DROP"
     fi
 fi
 }

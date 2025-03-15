@@ -27,8 +27,12 @@ REMOTE_PORT_TEST
 read -e -p "$(echo -e "${BLUE_COLOR}请输入限制访问的本地端口号(远端与本地只能二选一  xx | xxx-xxx)： ${RES}")" LOCAL_PORT
 LOCAL_PORT_TEST
 
-# 远端端口号与本地端口号只能开放一个
-REMOTE_LOCAL_PORT_TEST
+# 在当前脚本中获取到的第一个入参
+if [ "${1}" == "firewalld" ]; then
+    # 在 firewalld 富规则中，只允许填写一个端口号
+    # 远端端口号与本地端口号只能开放一个
+    REMOTE_LOCAL_PORT_TEST
+fi
 
 # 输入协议类型
 read -e -p "$(echo -e "${BLUE_COLOR}请输入限制访问的协议类型(常用：tcp/udp)： ${RES}")" PROTOCOL
