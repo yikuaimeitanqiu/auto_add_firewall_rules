@@ -158,9 +158,15 @@ fi
 
 # 输入防火墙策略的动作类型(数字类型)
 ACCEPT_DROP_TEST_NUM () {
-if [ "${ACCEPT_DROP}" -eq "1" ]; then
+# 不存在执行动作，不允许继续执行
+if [ -z "${ACCEPT_DROP}" ]; then
+    echo -e "${RED_COLOR}请正确按提示输入 1/2 \n${RES}"
+    exit 1
+fi
+
+if [ "${ACCEPT_DROP}" -eq 1 ]; then
     ACCEPT_DROP='accept'
-elif [ "${ACCEPT_DROP}" -eq "2" ]; then
+elif [ "${ACCEPT_DROP}" -eq 2 ]; then
     ACCEPT_DROP='drop'
 else
     echo -e "${RED_COLOR}请正确按提示输入 1/2 \n${RES}"
