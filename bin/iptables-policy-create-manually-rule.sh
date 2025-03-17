@@ -35,6 +35,12 @@ REMOTE_LOCAL_ADDR_RULES
 REMOTE_LOCAL_ADDR_NULL_RULES
 ONLY_REMOTE_LOCAL_ADDR_RULES
 
+# 判断未能匹配到规则时提示
+if [ -z "${IPTABLES_RULES}" ]; then
+    echo -e "${RED_COLOR}未能匹配到默认设置的表链规则，请检查参数，重新设置\n${RES}"
+    exit 0
+fi
+
 # 根据检测规则输出提示进入选择执行
 read -e -r -p "$(echo -e "${BLUE_COLOR}请确认: 是否使用以上手动添加防火墙策略?  (y/n)  ${RES}")" YesNo
 
@@ -74,3 +80,7 @@ elif [ "${TABLE_CHAIN}" == "FORWARD" ]; then
     # 输出 FORWARD 链规则
     IPTABLES_FORWARD_RULES
 fi
+
+exit 0
+
+
