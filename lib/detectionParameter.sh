@@ -148,6 +148,7 @@ PROTOCOL_TEST () {
 # 匹配系统中储存的协议文件格式,该文件是根据IANA列表创建,详情请看/etc/protocols
 PROTOCOL_NULL="$(grep -v -E "^$" /etc/protocols | grep -v -E "^#" | awk -F " " '{print $1}' | grep -E "^${PROTOCOL}$")"
 if [ -z "${PROTOCOL_NULL}" ]; then
+    echo -e "${RED_COLOR}${PROTOCOL} 在 /etc/protocols 协议类型中未能匹配到，请谨慎操作。${RES}"
     # 判断存在端口号,则要求传入协议类型
     if [ -n "${REMOTE_PORT}" ] || [ -n "${LOCAL_PORT}" ]; then
         echo -e "${RED_COLOR}请正确输入协议类型\n${RES}"
