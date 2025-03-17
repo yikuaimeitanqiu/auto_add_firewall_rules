@@ -101,7 +101,17 @@ IPTABLES_FORWARD_RULES () {
     TIPS_MSG "----------------------------------------------------------------\n"
 }
 
+# 备份防火墙策略
+BACKUP_IPTABLES_RULES () {
+    if command -v iptables-save 1>/dev/null; then
+        NOW="$(date +%Y_%m%d_%H%M%S)"
+        /usr/bin/mkdir -p "${LIB_SCRIPT_PATH}/../backup/iptables/${NOW}"
+        iptables-save --table filter >  "${LIB_SCRIPT_PATH}/backup/iptables/${NOW}/backup_rules.txt"
+    else
+        WARN_MSG "未备份当前 filter 防火墙中的策略"
+    fi
 
+}
 
 
 # 远端地址不空，本地地址为空

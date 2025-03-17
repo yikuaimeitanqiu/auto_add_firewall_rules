@@ -31,9 +31,9 @@ echo -e "\n"
 # 防火墙富规则检测
 REMOTE_ADDR_RULES
 LOCAL_ADDR_RULES
-REMOTE_LOCAL_ADDR_RULES 
+REMOTE_LOCAL_ADDR_RULES
 REMOTE_LOCAL_ADDR_NULL_RULES
-ONLY_REMOTE_LOCAL_ADDR_RULES 
+ONLY_REMOTE_LOCAL_ADDR_RULES
 
 # 根据检测规则输出提示进入选择执行
 read -e -r -p "$(echo -e "${BLUE_COLOR}请确认: 是否使用以上手动添加防火墙策略?  (y/n)  ${RES}")" YesNo
@@ -41,6 +41,10 @@ read -e -r -p "$(echo -e "${BLUE_COLOR}请确认: 是否使用以上手动添加
 if [ "${YesNo}" == "y" ] || [ "${YesNo}" == "Y" ]; then
 
     if ! iptables --table filter --check ${IPTABLES_RULES} 2>/dev/null; then
+
+        # 先备份一下 filter 策略
+        BACKUP_IPTABLES_RULES
+
         if iptables --table filter --append ${IPTABLES_RULES} &>/dev/null; then
             echo -e "${GREEN_COLOR}\t\t\t添加防火墙策略成功\n${RES}"
         else
