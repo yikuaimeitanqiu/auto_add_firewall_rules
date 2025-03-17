@@ -20,7 +20,11 @@ read -e -r -p "$(echo -e "${BLUE_COLOR}请输入限制访问的本地地址(x.x.
 LOCAL_ADDR_TEST
 
 # 输入远端端口号,并检测正确性
-read -e -r -p "$(echo -e "${BLUE_COLOR}请输入限制访问的远端端口号(远端与本地只能二选一  xx | xxx-xxx)： ${RES}")" REMOTE_PORT
+if [ "${1}" == "firewalld" ]; then
+    read -e -r -p "$(echo -e "${BLUE_COLOR}请输入限制访问的远端端口号(远端与本地只能二选一  xx | xxx-xxx)： ${RES}")" REMOTE_PORT
+elif [ "${1}" == "iptables" ]; then
+    read -e -r -p "$(echo -e "${BLUE_COLOR}请输入限制访问的远端端口号(xx | xxx-xxx)： ${RES}")" REMOTE_PORT
+fi
 REMOTE_PORT_TEST
 
 # 在当前脚本中获取到的第一个入参
@@ -30,7 +34,11 @@ if [ "${1}" == "iptables" ]; then
 fi
 
 # 输入本地端口号,并检测正确性
-read -e -r -p "$(echo -e "${BLUE_COLOR}请输入限制访问的本地端口号(远端与本地只能二选一  xx | xxx-xxx)： ${RES}")" LOCAL_PORT
+if [ "${1}" == "firewalld" ]; then
+    read -e -r -p "$(echo -e "${BLUE_COLOR}请输入限制访问的本地端口号(远端与本地只能二选一  xx | xxx-xxx)： ${RES}")" LOCAL_PORT
+elif [ "${1}" == "iptables" ]; then
+    read -e -r -p "$(echo -e "${BLUE_COLOR}请输入限制访问的本地端口号(xx | xxx-xxx)： ${RES}")" LOCAL_PORT
+fi
 LOCAL_PORT_TEST
 
 # 在当前脚本中获取到的第一个入参
