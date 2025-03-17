@@ -106,7 +106,7 @@ BACKUP_IPTABLES_RULES () {
     if command -v iptables-save 1>/dev/null; then
         NOW="$(date +%Y_%m%d_%H%M%S)"
         /usr/bin/mkdir -p "${LIB_SCRIPT_PATH}/../backup/iptables/${NOW}"
-        iptables-save --table filter >  "${LIB_SCRIPT_PATH}/backup/iptables/${NOW}/backup_rules.txt"
+        iptables-save --table filter >  "${LIB_SCRIPT_PATH}/../backup/iptables/${NOW}/backup_rules.txt"
     else
         WARN_MSG "未备份当前 filter 防火墙中的策略"
     fi
@@ -137,6 +137,16 @@ if [ -n "${REMOTE_ADDR}" ] && [ -z "${LOCAL_ADDR}" ] && [ -n "${PROTOCOL}" ];the
     elif [ -n "${REMOTE_PORT}" ] && [ -z "${LOCAL_PORT}" ] && [ "${ACCEPT_DROP}" == "drop" ]; then
         echo -e "${RED_COLOR}在 filter 表 ${TABLE_CHAIN} 链下添加：禁止指定远端地址:${REMOTE_ADDR} 指定远端端口:${REMOTE_PORT}/${PROTOCOL}${RES}"
         IPTABLES_RULES="${TABLE_CHAIN} --source ${REMOTE_ADDR} --protocol ${PROTOCOL} --source-port ${LOCAL_PORT} --jump DROP"
+
+    # 允许指定的远端地址及指定远端端口访问本地的指定端口
+    elif [ -n "${REMOTE_PORT}" ] && [ -n "${LOCAL_PORT}" ] && [ "${ACCEPT_DROP}" == "accept" ]; then
+        echo -e "${RED_COLOR}在 filter 表 ${TABLE_CHAIN} 链下添加：允许指定远端地址:${REMOTE_ADDR} 指定远端端口:${REMOTE_PORT}/${PROTOCOL} 访问本地指定端口: ${LOCAL_PORT}/${PROTOCOL}${RES}"
+        IPTABLES_RULES="${TABLE_CHAIN} --source ${REMOTE_ADDR} --protocol ${PROTOCOL} --source-port ${REMOTE_PORT} --destination-port ${LOCAL_PORT} --jump ACCEPT"
+
+    # 禁止指定的远端地址及指定远端端口访问本地的指定端口
+    elif [ -n "${REMOTE_PORT}" ] && [ -n "${LOCAL_PORT}" ] && [ "${ACCEPT_DROP}" == "drop" ]; then
+        echo -e "${RED_COLOR}在 filter 表 ${TABLE_CHAIN} 链下添加：禁止指定远端地址:${REMOTE_ADDR} 指定远端端口:${REMOTE_PORT}/${PROTOCOL} 访问本地指定端口: ${LOCAL_PORT}/${PROTOCOL}${RES}"
+        IPTABLES_RULES="${TABLE_CHAIN} --source ${REMOTE_ADDR} --protocol ${PROTOCOL} --source-port ${REMOTE_PORT} --destination-port ${LOCAL_PORT} --jump DROP"
     fi
 fi
 }
@@ -165,6 +175,16 @@ if [ -z "${REMOTE_ADDR}" ] && [ -n "${LOCAL_ADDR}" ] && [ -n "${PROTOCOL}" ];the
     elif [ -n "${REMOTE_PORT}" ] && [ -z "${LOCAL_PORT}" ] && [ "${ACCEPT_DROP}" == "drop" ]; then
         echo -e "${RED_COLOR}在 filter 表 ${TABLE_CHAIN} 链下添加：禁止任意远端地址及指定远端端口:${REMOTE_PORT}/${PROTOCOL} 访问本地地址:${LOCAL_ADDR}${RES}"
         IPTABLES_RULES="${TABLE_CHAIN} --destination ${LOCAL_ADDR} --protocol ${PROTOCOL} --source-port ${REMOTE_PORT} --jump DROP"
+
+    # 允许任意远端地址及指定远端端口访问指定本地的指定端口
+    elif [ -n "${REMOTE_PORT}" ] && [ -n "${LOCAL_PORT}" ] && [ "${ACCEPT_DROP}" == "accept" ]; then
+        echo -e "${RED_COLOR}在 filter 表 ${TABLE_CHAIN} 链下添加：允许任意远端地址及指定远端端口:${REMOTE_PORT}/${PROTOCOL} 访问本地地址:${LOCAL_ADDR}的指定端口:${LOCAL_PORT}/${PROTOCOL}${RES}"
+        IPTABLES_RULES="${TABLE_CHAIN} --destination ${LOCAL_ADDR} --protocol ${PROTOCOL} --source-port ${REMOTE_PORT} --destination-port ${LOCAL_PORT} --jump ACCEPT"
+
+    # 禁止任意远端地址及指定远端端口访问指定本地的指定端口
+    elif [ -n "${REMOTE_PORT}" ] && [ -n "${LOCAL_PORT}" ] && [ "${ACCEPT_DROP}" == "drop" ]; then
+        echo -e "${RED_COLOR}在 filter 表 ${TABLE_CHAIN} 链下添加：禁止任意远端地址及指定远端端口:${REMOTE_PORT}/${PROTOCOL} 访问本地地址:${LOCAL_ADDR}的指定端口:${LOCAL_PORT}/${PROTOCOL}${RES}"
+        IPTABLES_RULES="${TABLE_CHAIN} --destination ${LOCAL_ADDR} --protocol ${PROTOCOL} --source-port ${REMOTE_PORT} --destination-port ${LOCAL_PORT} --jump DROP"
     fi
 fi
 }
@@ -231,6 +251,16 @@ if [ -z "${REMOTE_ADDR}" ] && [ -z "${LOCAL_ADDR}" ] && [ -n "${PROTOCOL}" ]; th
     elif [ -n "${REMOTE_PORT}" ] && [ -z "${LOCAL_PORT}" ] && [ "${ACCEPT_DROP}" == "drop" ]; then
         echo -e "${RED_COLOR}在 filter 表 ${TABLE_CHAIN} 链下添加：禁止任意远端地址通过指定远端端口:${REMOTE_PORT}/${PROTOCOL}${RES}"
         IPTABLES_RULES="${TABLE_CHAIN} --protocol ${PROTOCOL} --source-port ${REMOTE_PORT} --jump DROP"
+
+    # 允许任意远端地址的指定端口访问本地指定端口
+    elif [ -n "${REMOTE_PORT}" ] && [ -n "${LOCAL_PORT}" ] && [ "${ACCEPT_DROP}" == "accept" ]; then
+        echo -e "${RED_COLOR}在 filter 表 ${TABLE_CHAIN} 链下添加：允许任意远端地址的指定端口:${REMOTE_PORT}/${PROTOCOL} 访问本地指定端口:${LOCAL_PORT}/${PROTOCOL}${RES}"
+        IPTABLES_RULES="${TABLE_CHAIN} --protocol ${PROTOCOL} --source-port ${REMOTE_PORT} --destination-port ${LOCAL_PORT} --jump ACCEPT"
+
+    # 禁止任意远端地址的指定端口访问本地指定端口
+    elif [ -n "${REMOTE_PORT}" ] && [ -n "${LOCAL_PORT}" ] && [ "${ACCEPT_DROP}" == "drop" ]; then
+        echo -e "${RED_COLOR}在 filter 表 ${TABLE_CHAIN} 链下添加：禁止任意远端地址的指定端口:${REMOTE_PORT}/${PROTOCOL} 访问本地指定端口:${LOCAL_PORT}/${PROTOCOL}${RES}"
+        IPTABLES_RULES="${TABLE_CHAIN} --protocol ${PROTOCOL} --source-port ${REMOTE_PORT} --destination-port ${LOCAL_PORT} --jump DROP"
     fi
 fi
 }

@@ -16,7 +16,7 @@ BIN_SCRIPT_PATH="$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && 
 . "${BIN_SCRIPT_PATH}"/../lib/detectionParameter.sh 
 
 # 执行输入参数,并引入 "IPV4地址/端口号/协议类型/动作" 变量
-. "${BIN_SCRIPT_PATH}"/../lib/inputControl.sh
+. "${BIN_SCRIPT_PATH}"/../lib/inputControl.sh iptables
 . "${BIN_SCRIPT_PATH}"/../lib/iptablesInputDetection.sh
 
 # 引用 防火墙富规则
